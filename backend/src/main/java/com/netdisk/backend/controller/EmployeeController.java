@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
+import java.time.LocalDateTime;
 
 @Slf4j
 @RestController
@@ -59,5 +60,32 @@ public class EmployeeController {
 //        清理session
         request.getSession().removeAttribute("employee");
         return R.success("退出成功");
+    }
+
+//    添加员工
+    @PostMapping("/employee/")
+    public R<String> save(HttpServletRequest request, @RequestBody Employee employee){
+
+//        设置初始密码
+        employee.setPassword(DigestUtils.md5DigestAsHex("123456".getBytes()));
+        employee.setCreateTime(LocalDateTime.now());
+        employee.setUpdateTime(LocalDateTime.now());
+
+        Long empID = (Long) request.getSession().getAttribute("employee");
+        employee.setCreateUser(empID);
+        employee.setUpdateUser(empID);
+
+//        如果有错误 则要捕获异常 这是最简单的写法
+//        try{
+//            employeeService.save(employee);
+//        }
+//        catch (Exception exception){
+//            R.error("新增员工失败");
+//        }
+
+//        这个使用全局的异常捕获
+        employeeService.save(employee);
+
+        return R.success("新增员工成功");
     }
 }

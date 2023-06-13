@@ -153,14 +153,18 @@
               }
             })
           },
+          //提交 添加员工表单
           submitForm (formName, st) {
+            // 做校验
             this.$refs[formName].validate((valid) => {
               if (valid) {
                 if (this.actionType === 'add') {
+                  //一个Jason 对象
                   const params = {
                     ...this.ruleForm,
                     sex: this.ruleForm.sex === '女' ? '0' : '1'
                   }
+                  // 调用api接口
                   addEmployee(params).then(res => {
                     if (res.code === 1) {
                       this.$message.success('员工添加成功！')
