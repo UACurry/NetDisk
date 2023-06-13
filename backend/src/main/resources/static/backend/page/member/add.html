@@ -131,6 +131,7 @@
           }
         },
         created() {
+          // requestUrlParam
           this.id = requestUrlParam('id')
           this.actionType = this.id ? 'edit' : 'add'
           if (this.id) {

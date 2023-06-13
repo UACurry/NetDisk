@@ -85,6 +85,7 @@
               @click="statusHandle(scope.row)"
               v-if="user === 'admin'"
             >
+<!--              显示按钮-->
               {{ scope.row.status == '1' ? '禁用' : '启用' }}
             </el-button>
           </template>
@@ -113,6 +114,7 @@
     <script>
       new Vue({
         el: '#member-app',
+        //分页的默认值
         data() {
           return {
              input: '',
@@ -125,8 +127,10 @@
           }
         },
         computed: {},
+        // 钩子函数 自动调用
         created() {
           this.init()
+          // 取出username 从而保证 只有 admin可以编辑 禁用
           this.user = JSON.parse(localStorage.getItem('userInfo')).username
         },
         mounted() {
@@ -176,6 +180,7 @@
               'cancelButtonText': '取消',
               'type': 'warning'
               }).then(() => {
+              //  调用api接口   'status': !this.status ? 1 : 0 表示取反 就是进行禁用
               enableOrDisableEmployee({ 'id': this.id, 'status': !this.status ? 1 : 0 }).then(res => {
                 console.log('enableOrDisableEmployee',res)
                 if (String(res.code) === '1') {
