@@ -174,6 +174,7 @@
         mounted() {
         },
         methods: {
+          // 调用分页查询
           async init () {
             await getCategoryPage({'page': this.page, 'pageSize': this.pageSize}).then(res => {
               if (String(res.code) === '1') {
@@ -245,6 +246,7 @@
                   if (reg.test(classData.sort)) {
                     addCategory({'name': classData.name,'type':this.type, sort: classData.sort}).then(res => {
                       console.log(res)
+                      // 返回值只需要 一个 code
                       if (res.code === 1) {
                         this.$message.success('分类添加成功！')
                         if (!st) {

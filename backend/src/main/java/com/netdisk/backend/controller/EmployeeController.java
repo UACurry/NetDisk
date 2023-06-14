@@ -67,12 +67,15 @@ public class EmployeeController {
 
 //        设置初始密码
         employee.setPassword(DigestUtils.md5DigestAsHex("123456".getBytes()));
-        employee.setCreateTime(LocalDateTime.now());
-        employee.setUpdateTime(LocalDateTime.now());
 
-        Long empID = (Long) request.getSession().getAttribute("employee");
-        employee.setCreateUser(empID);
-        employee.setUpdateUser(empID);
+//        使用公共字段 统一填充 的 MyMetaObjectHandler
+//        employee.setCreateTime(LocalDateTime.now());
+//        employee.setUpdateTime(LocalDateTime.now());
+//
+//        Long empID = (Long) request.getSession().getAttribute("employee");
+//        //        使用公共字段 统一填充 的 MyMetaObjectHandler
+//        employee.setCreateUser(empID);
+//        employee.setUpdateUser(empID);
 
 //        如果有错误 则要捕获异常 这是最简单的写法
 //        try{
@@ -82,7 +85,7 @@ public class EmployeeController {
 //            R.error("新增员工失败");
 //        }
 
-//        这个使用全局的异常捕获
+//        如有错误 使用全局的异常捕获 也就是 当用户名重复时候
         employeeService.save(employee);
 
         return R.success("新增员工成功");
@@ -95,12 +98,12 @@ public class EmployeeController {
      * @param name
      * @return
      */
-//    Page 是 mybatis plus 规定好的 里面又 records 和 total 正好也是前端需要的
+//    Page 是 mybatis plus 规定好的 里面有 records 和 total 正好也是前端需要的
     @GetMapping ("/employee/page/")
     public R<Page> page(int page, int pageSize, String name){
 
 //        分页构造器
-        Page pageInfo = new Page(page, pageSize);
+        Page<Employee> pageInfo = new Page<>(page, pageSize);
 
 //        条件构造器
         LambdaQueryWrapper<Employee> queryWrapper = new LambdaQueryWrapper<>();
@@ -124,10 +127,13 @@ public class EmployeeController {
     @PutMapping("/employee/")
     public R<String> update(HttpServletRequest request, @RequestBody Employee employee){
         log.info(employee.toString());
-        employee.setUpdateTime(LocalDateTime.now());
+        //使用公共字段 统一填充 的 MyMetaObjectHandler
+//        employee.setUpdateTime(LocalDateTime.now());
         Long empId = (Long)request.getSession().getAttribute("employee");
-        employee.setUpdateUser(empId);
+        //使用公共字段 统一填充 的 MyMetaObjectHandler
+//        employee.setUpdateUser(empId);
         employeeService.updateById(employee);
+
         return R.success("员工信息修改成功");
     }
 

@@ -1,6 +1,7 @@
 package com.netdisk.backend.config.filter;
 
 import com.alibaba.fastjson.JSON;
+import com.netdisk.backend.common.BaseContext;
 import com.netdisk.backend.common.R;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.AntPathMatcher;
@@ -49,8 +50,13 @@ public class LoginCheckFilter implements Filter {
         }
 
 //        判断是否登陆
-//        从session获取有无
+//        从session获取有无 如果有 则放行
         if(request.getSession().getAttribute("employee") != null){
+
+//            将id保存到 threadlocal
+            Long empID = (Long) request.getSession().getAttribute("employee");
+
+            BaseContext.setCurrentId(empID);
             filterChain.doFilter(request, response);
             return;
         }
