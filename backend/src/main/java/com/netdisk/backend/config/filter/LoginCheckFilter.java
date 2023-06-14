@@ -53,7 +53,7 @@ public class LoginCheckFilter implements Filter {
 //        从session获取有无 如果有 则放行
         if(request.getSession().getAttribute("employee") != null){
 
-//            将id保存到 threadlocal
+//            将id保存到 threadlocal 从而应用于 公共字段的更新
             Long empID = (Long) request.getSession().getAttribute("employee");
 
             BaseContext.setCurrentId(empID);
