@@ -37,6 +37,7 @@ public class LoginCheckFilter implements Filter {
 //                静态资源放行
                 "/backend/**",
                 "/front/**",
+                "/common/**"
         };
 
 

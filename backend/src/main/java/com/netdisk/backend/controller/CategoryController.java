@@ -8,6 +8,8 @@ import com.netdisk.backend.service.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 public class CategoryController {
     @Autowired
@@ -55,5 +57,24 @@ public class CategoryController {
     public R<String> update(@RequestBody Category category){
         categoryService.updateById(category);
         return R.success("修改信息成功");
+    }
+
+    /**
+     * 查询类别数据 用于在新建菜品中 展示有哪些菜品种类
+     * @param category
+     * @return
+     */
+    @GetMapping("/category/list/")
+    public R<List<Category>> listR(Category category){
+        LambdaQueryWrapper<Category> queryWrapper = new LambdaQueryWrapper<>();
+
+//        添加条件
+        queryWrapper.eq(category.getType() != null, Category::getType, category.getType());
+//        添加排序
+        queryWrapper.orderByAsc(Category::getSort).orderByDesc(Category::getUpdateTime);
+
+        List<Category> list = categoryService.list(queryWrapper);
+
+        return R.success(list);
     }
 }

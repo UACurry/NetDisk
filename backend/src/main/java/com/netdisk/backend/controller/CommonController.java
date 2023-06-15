@@ -54,34 +54,41 @@ public class CommonController {
             e.printStackTrace();
         }
 
+//        需要把文件名写回去 因为后面要做 浏览器显示用
         return R.success(fileName);
     }
 
+    /**
+     * 用于将图片回显在网页上
+     * @param name
+     * @param response
+     */
     @GetMapping("/common/download/")
+//    void 通过输出流的方式 写回 无需返回值    response 输出流通过 response
     public void download(String name, HttpServletResponse response){
 
         try {
-            //        输入流
+            // 输入流 读取文件夹里面的内容
             FileInputStream fileInputStream = new FileInputStream(new File(basePath + name));
 
-            //        输出流
+            // 输出流 将读到的文件内容 写回
             ServletOutputStream outputStream = response.getOutputStream();
 
             response.setContentType("image/jpeg");
 
             int len = 0;
             byte[] bytes = new byte[1024];
+//            != -1 说明没有读完 图片
             while((len = fileInputStream.read(bytes)) != -1){
+//                把bytes数组写进 outputStream
                 outputStream.write(bytes,0,len);
                 outputStream.flush();
             }
 
-            fileInputStream.close();
             outputStream.close();
+            fileInputStream.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-
     }
 }
