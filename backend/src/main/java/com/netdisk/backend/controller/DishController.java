@@ -16,10 +16,7 @@ import com.netdisk.backend.service.DishService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -92,5 +89,28 @@ public class DishController {
         dishDtoPage.setRecords(list);
 
         return R.success(dishDtoPage);
+    }
+
+    /**
+     * 根据id 查询菜品信息 和 口味信息 使用 DishDto
+     * @param id
+     * @return
+     */
+    @GetMapping("/dish/{id}")
+    public R<DishDto> edit(@PathVariable Long id){
+        DishDto byIdWithFlavor = dishService.getByIdWithFlavor(id);
+        return R.success(byIdWithFlavor);
+    }
+
+    /**
+     * 修改菜品 同时注意 还需要更新口味表
+     * @param dishDto
+     * @return
+     */
+    @PutMapping("/dish/")
+    public R<String> update(@RequestBody DishDto dishDto){
+        log.info(dishDto.toString());
+        dishService.updateWithFlavor(dishDto);
+        return R.success("修改菜品成功");
     }
 }
