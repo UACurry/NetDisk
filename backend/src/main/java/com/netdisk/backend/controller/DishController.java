@@ -5,9 +5,11 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.netdisk.backend.common.R;
 import com.netdisk.backend.dto.DishDto;
+import com.netdisk.backend.dto.SetmealDto;
 import com.netdisk.backend.pojo.Category;
 import com.netdisk.backend.pojo.Dish;
 import com.netdisk.backend.pojo.Employee;
+import com.netdisk.backend.pojo.Setmeal;
 import com.netdisk.backend.service.CategoryService;
 import com.netdisk.backend.service.DishFlavorService;
 import com.netdisk.backend.service.DishService;
@@ -33,7 +35,7 @@ public class DishController {
     private DishFlavorService dishFlavorService;
 
     @Autowired
-    private CategoryService categoryService
+    private CategoryService categoryService;
 
     /**
      * 新增菜品
@@ -78,14 +80,17 @@ public class DishController {
 //            分类id
             Long categotyId = item.getCategoryId();
             Category category = categoryService.getById(categotyId);
-            String categoryname = category.getName();
-            dishDto.setCategoryName(categoryname);
+
+            if(category != null){
+                String categoryname = category.getName();
+                dishDto.setCategoryName(categoryname);
+            }
 
             return dishDto;
         }).collect(Collectors.toList());
 
         dishDtoPage.setRecords(list);
 
-        return R.success(pageInfo);
+        return R.success(dishDtoPage);
     }
 }
