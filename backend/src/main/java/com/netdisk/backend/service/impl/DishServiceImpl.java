@@ -77,6 +77,8 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
 
 //    更新操作
     @Override
+    //    由于涉及到多张表 需要加这个注解  事务的支持
+    @Transactional
     public void updateWithFlavor(DishDto dishDto) {
 
 //        更新dish基本信息  dishDto 继承自 dish 也就是更新dish表

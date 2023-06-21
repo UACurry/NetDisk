@@ -51,10 +51,10 @@ const getCategoryList = (params) => {
   })
 }
 
-// 查菜品列表的接口
+// 查菜品列表的接口  在新增套餐中 需要展示各个菜品
 const queryDishList = (params) => {
   return $axios({
-    url: '/dish/list',
+    url: '/dish/list/',
     method: 'get',
     params
   })
@@ -66,7 +66,7 @@ const commonDownload = (params) => {
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
     },
-    url: '/common/download',
+    url: '/common/download/',
     method: 'get',
     params
   })
