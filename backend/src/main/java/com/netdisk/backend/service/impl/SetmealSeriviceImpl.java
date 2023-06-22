@@ -1,6 +1,8 @@
 package com.netdisk.backend.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.netdisk.backend.common.CustomException;
 import com.netdisk.backend.dto.SetmealDto;
 import com.netdisk.backend.mapper.SetmealMapper;
 import com.netdisk.backend.pojo.Setmeal;
@@ -13,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -42,5 +45,33 @@ public class SetmealSeriviceImpl extends ServiceImpl<SetmealMapper, Setmeal> imp
 
 //        保存关联信息
         setmealDishService.saveBatch(setmealDishes);
+    }
+
+    //    删除套餐 同时删除套餐和菜品关联数据
+    @Override
+    @Transactional
+    public void removeWithDish(List<Long> ids) {
+        // 只有停售套餐才能删除
+        LambdaQueryWrapper<Setmeal> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.in(Setmeal::getId,ids);
+        queryWrapper.eq(Setmeal::getStatus, 1);
+
+        int count = this.count(queryWrapper);
+
+//        证明有 套餐不能删除
+        if(count > 0){
+            //         在售卖 抛出异常
+            throw new CustomException("正在售卖 不能删除");
+        }
+
+//        删除套餐表 setmeal
+        this.removeByIds(ids);
+
+//        删除关系表 setmealDish
+//        delete from setmeal_dish where setmeal_id in  1 2 3
+        LambdaQueryWrapper<SetmealDish> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        lambdaQueryWrapper.in(SetmealDish::getSetmealId, ids);
+
+        setmealDishService.remove(lambdaQueryWrapper);
     }
 }
