@@ -6,10 +6,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.netdisk.backend.common.R;
 import com.netdisk.backend.dto.DishDto;
 import com.netdisk.backend.dto.SetmealDto;
-import com.netdisk.backend.pojo.Category;
-import com.netdisk.backend.pojo.Dish;
-import com.netdisk.backend.pojo.Employee;
-import com.netdisk.backend.pojo.Setmeal;
+import com.netdisk.backend.pojo.*;
 import com.netdisk.backend.service.CategoryService;
 import com.netdisk.backend.service.DishFlavorService;
 import com.netdisk.backend.service.DishService;
@@ -116,20 +113,70 @@ public class DishController {
 
     /**
      * 根据 categoriesid返回有哪些对应的菜品
+     *
+     * 后续改进 在用户端 要返回菜品 同时也要返回菜品的口味 但是Dish中没有口味信息
+     */
+//    @GetMapping("/dish/list/")
+//    public R<List<Dish>> list(Dish dish){
+//        LambdaQueryWrapper<Dish> queryWrapper = new LambdaQueryWrapper<>();
+//        queryWrapper.eq(dish.getCategoryId() != null, Dish::getCategoryId, dish.getCategoryId());
+//
+////        只查起售的  getStatus 为 1的
+//        queryWrapper.eq(Dish::getStatus, 1);
+//
+//        queryWrapper.orderByAsc(Dish::getSort).orderByDesc(Dish::getUpdateTime);
+//
+//        List<Dish> list = dishService.list(queryWrapper);
+//
+//        return R.success(list);
+//    }
+
+    /**
+     * 根据 categoriesid返回有哪些对应的菜品
+     *
+     * 后续改进 在用户端 首页获取有哪些菜品时候 同时也要返回菜品的口味 但是Dish中没有口味信息
+     * 所以需要使用DishDto 来保证有口味数据
      */
     @GetMapping("/dish/list/")
-    public R<List<Dish>> list(Dish dish){
+    public R<List<DishDto>> list(Dish dish){
         LambdaQueryWrapper<Dish> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(dish.getCategoryId() != null, Dish::getCategoryId, dish.getCategoryId());
 
-//        只查起售的
+//        只查起售的  getStatus 为 1的
         queryWrapper.eq(Dish::getStatus, 1);
 
         queryWrapper.orderByAsc(Dish::getSort).orderByDesc(Dish::getUpdateTime);
 
         List<Dish> list = dishService.list(queryWrapper);
 
-        return R.success(list);
+        List<DishDto> dishDtoList = list.stream().map((item) -> {
+            DishDto dishDto = new DishDto();
+
+            BeanUtils.copyProperties(item, dishDto);
+
+//            分类id
+            Long categotyId = item.getCategoryId();
+            Category category = categoryService.getById(categotyId);
+
+            if(category != null){
+                String categoryname = category.getName();
+                dishDto.setCategoryName(categoryname);
+            }
+
+//            菜品的id
+            Long dishId = item.getId();
+
+//            查询id对应的口味
+            LambdaQueryWrapper<DishFlavor> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+            lambdaQueryWrapper.eq(DishFlavor::getDishId, dishId);
+//            dishID的 口味的集合
+            List<DishFlavor> dishFlavorList = dishFlavorService.list(lambdaQueryWrapper);
+            dishDto.setFlavors(dishFlavorList);
+
+            return dishDto;
+        }).collect(Collectors.toList());
+
+        return R.success(dishDtoList);
     }
 
 }
